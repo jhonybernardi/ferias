@@ -130,6 +130,64 @@
   .confete { position: fixed; top: -20px; width: 10px; height: 16px; z-index: 5; animation: cair linear forwards; pointer-events: none; }
   @keyframes cair { to { transform: translateY(110vh) rotate(720deg); } }
 
+
+  /* ============ JOGO ============ */
+  .btn-jogar {
+    margin-top: 26px; border: none; cursor: pointer;
+    font-family: 'Poppins', sans-serif; font-weight: 800; font-size: clamp(1rem, 3vw, 1.2rem);
+    color: #fff; background: linear-gradient(135deg, #ff6b6b, #ff9f1c);
+    padding: 14px 30px; border-radius: 999px;
+    box-shadow: 0 6px 0 #d9480f, 0 12px 24px rgba(0,0,0,.2);
+    transition: transform .1s, box-shadow .1s;
+    animation: chamar 2s ease-in-out infinite;
+  }
+  .btn-jogar:active { transform: translateY(4px); box-shadow: 0 2px 0 #d9480f; }
+  @keyframes chamar { 50% { transform: scale(1.05); } }
+
+  .jogo-overlay {
+    position: fixed; inset: 0; z-index: 10;
+    background: rgba(0, 60, 100, .55); backdrop-filter: blur(4px);
+    display: none; align-items: center; justify-content: center; padding: 12px;
+  }
+  .jogo-overlay.aberto { display: flex; }
+  .jogo-box {
+    position: relative; width: min(460px, 100%); height: min(680px, 100%);
+    border-radius: 24px; overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,.35);
+    border: 4px solid #fff;
+  }
+  #tela { display: block; width: 100%; height: 100%; touch-action: none; cursor: none; }
+  .hud {
+    position: absolute; top: 0; left: 0; right: 0;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 14px; font-weight: 800; color: #0077b6; font-size: 1.1rem;
+    pointer-events: none;
+  }
+  .hud span { background: rgba(255,255,255,.85); padding: 4px 12px; border-radius: 999px; }
+  .fechar {
+    position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
+    border: none; background: rgba(255,255,255,.85); color: #0077b6;
+    width: 36px; height: 36px; border-radius: 50%; font-size: 1.2rem; font-weight: 800; cursor: pointer;
+  }
+  .painel {
+    position: absolute; inset: 0; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; text-align: center; gap: 10px;
+    padding: 24px; background: rgba(255,255,255,.9); color: #0077b6;
+  }
+  .painel.escondido { display: none; }
+  .painel h2 { font-family: 'Pacifico', cursive; font-size: 2.1rem; color: #ff6b6b; line-height: 1.2; }
+  .painel p { font-size: .98rem; color: #355; }
+  .painel .itens { font-size: 1.6rem; letter-spacing: 4px; }
+  .painel .placar { font-size: 3rem; font-weight: 800; line-height: 1; }
+  .painel button {
+    margin-top: 8px; border: none; cursor: pointer; font-family: inherit; font-weight: 800; font-size: 1.1rem;
+    color: #fff; background: linear-gradient(135deg, #00b4d8, #0077b6);
+    padding: 12px 28px; border-radius: 999px; box-shadow: 0 5px 0 #023e8a;
+  }
+  .painel button:active { transform: translateY(3px); box-shadow: 0 2px 0 #023e8a; }
+  .tremer { animation: tremer .3s; }
+  @keyframes tremer { 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation: none !important; }
   }
@@ -154,7 +212,36 @@
 
     <p class="data" id="data"></p>
     <p class="frase" id="frase"></p>
+
+    <button class="btn-jogar" id="btnJogar">🎮 Jogar: Arrume a Mala!</button>
   </main>
+
+  <div class="jogo-overlay" id="overlay">
+    <div class="jogo-box" id="jogoBox">
+      <canvas id="tela"></canvas>
+      <div class="hud"><span id="hudPontos">🧳 0</span><span id="hudVidas">❤️❤️❤️</span></div>
+      <button class="fechar" id="btnFechar" aria-label="Fechar jogo">✕</button>
+
+      <div class="painel" id="painelInicio">
+        <h2>Arrume a Mala!</h2>
+        <p>Pegue as coisas de praia com a mala 🧳<br>e fuja do trabalho!</p>
+        <p class="itens">🩴🕶️👙🧴🍹🐚</p>
+        <p><b>Evite:</b></p>
+        <p class="itens">📧💼⏰🌧️</p>
+        <p>Arraste o dedo/mouse ou use ← →</p>
+        <button id="btnComecar">Bora! 🏖️</button>
+      </div>
+
+      <div class="painel escondido" id="painelFim">
+        <h2 id="fimTitulo">Fim de jogo!</h2>
+        <p>Itens na mala</p>
+        <div class="placar" id="fimPontos">0</div>
+        <p id="fimRecorde"></p>
+        <p id="fimFrase"></p>
+        <button id="btnDeNovo">Jogar de novo 🔁</button>
+      </div>
+    </div>
+  </div>
 
   <div class="praia">
     <div class="onda o1"></div>
@@ -167,7 +254,7 @@
 
 <script>
   // ==================== CONFIGURE AQUI ====================
-  const DATA_FERIAS = "2027-01-27T08:00:00";   // ano-mês-diaThora:min:seg
+  const DATA_FERIAS = "2026-12-20T00:00:00";   // ano-mês-diaThora:min:seg
   const NOMES       = "Jhony & Vitória 💛";
   // ========================================================
 
@@ -251,6 +338,163 @@
   setInterval(atualizar, 1000);
   setInterval(trocarFrase, 4000);
   setInterval(soltarEmoji, 1200);
+
+  // ==================== JOGO: ARRUME A MALA ====================
+  (() => {
+    const BONS = ["🩴","🕶️","👙","🧴","🍹","🐚","👒","🥥","📷","🏐"];
+    const RUINS = ["📧","💼","⏰","🌧️"];
+    const overlay = $("overlay"), box = $("jogoBox"), tela = $("tela"), ctx = tela.getContext("2d");
+    let W, H, dpr, mala, itens, efeitos, pontos, vidas, rodando, ultimo, tempoSpawn, tempoJogo, teclas = {};
+
+    function lerRecorde() { try { return +localStorage.getItem("recordeMala") || 0; } catch { return 0; } }
+    function salvarRecorde(v) { try { localStorage.setItem("recordeMala", v); } catch {} }
+
+    function medir() {
+      dpr = window.devicePixelRatio || 1;
+      W = box.clientWidth; H = box.clientHeight;
+      tela.width = W * dpr; tela.height = H * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    function abrir() { overlay.classList.add("aberto"); medir(); mostrar("painelInicio"); desenhar(); }
+    function fechar() { overlay.classList.remove("aberto"); rodando = false; }
+    function mostrar(id) {
+      $("painelInicio").classList.toggle("escondido", id !== "painelInicio");
+      $("painelFim").classList.toggle("escondido", id !== "painelFim");
+    }
+
+    function comecar() {
+      medir();
+      mala = { x: W / 2, y: H - 70, tam: 56 };
+      itens = []; efeitos = []; pontos = 0; vidas = 3; tempoSpawn = 0; tempoJogo = 0;
+      atualizarHud(); mostrar(null);
+      rodando = true; ultimo = performance.now();
+      requestAnimationFrame(loop);
+    }
+
+    function atualizarHud() {
+      $("hudPontos").textContent = "🧳 " + pontos;
+      $("hudVidas").textContent = "❤️".repeat(vidas) + "🤍".repeat(3 - vidas);
+    }
+
+    function criarItem() {
+      const nivel = Math.min(tempoJogo / 60, 1);              // 0 → 1 em 60s
+      const ruim = Math.random() < 0.22 + nivel * 0.18;
+      const lista = ruim ? RUINS : BONS;
+      itens.push({
+        e: lista[Math.floor(Math.random() * lista.length)], ruim,
+        x: 30 + Math.random() * (W - 60), y: -30,
+        v: 140 + nivel * 230 + Math.random() * 60,
+        giro: (Math.random() - .5) * 3, ang: 0
+      });
+    }
+
+    function loop(agora) {
+      if (!rodando) return;
+      const dt = Math.min((agora - ultimo) / 1000, 0.05); ultimo = agora;
+      tempoJogo += dt;
+
+      // mover mala pelo teclado
+      const vel = 520;
+      if (teclas.ArrowLeft || teclas.a) mala.x -= vel * dt;
+      if (teclas.ArrowRight || teclas.d) mala.x += vel * dt;
+      mala.x = Math.max(30, Math.min(W - 30, mala.x));
+
+      // spawn
+      tempoSpawn -= dt;
+      if (tempoSpawn <= 0) { criarItem(); tempoSpawn = Math.max(0.32, 0.9 - tempoJogo * 0.01); }
+
+      // itens
+      for (let i = itens.length - 1; i >= 0; i--) {
+        const it = itens[i];
+        it.y += it.v * dt; it.ang += it.giro * dt;
+        const pegou = Math.abs(it.x - mala.x) < 42 && Math.abs(it.y - mala.y) < 34;
+        if (pegou) {
+          itens.splice(i, 1);
+          if (it.ruim) {
+            vidas--; efeitos.push({ t: "-1 ❤️", x: it.x, y: it.y, vida: 1, cor: "#e63946" });
+            box.classList.remove("tremer"); void box.offsetWidth; box.classList.add("tremer");
+            if (navigator.vibrate) navigator.vibrate(120);
+          } else {
+            pontos++; efeitos.push({ t: "+1", x: it.x, y: it.y, vida: 1, cor: "#06d6a0" });
+          }
+          atualizarHud();
+          if (vidas <= 0) return fim();
+        } else if (it.y > H + 40) itens.splice(i, 1);
+      }
+      for (let i = efeitos.length - 1; i >= 0; i--) {
+        efeitos[i].vida -= dt * 1.5; efeitos[i].y -= 50 * dt;
+        if (efeitos[i].vida <= 0) efeitos.splice(i, 1);
+      }
+
+      desenhar();
+      requestAnimationFrame(loop);
+    }
+
+    function desenhar() {
+      // céu
+      let g = ctx.createLinearGradient(0, 0, 0, H);
+      g.addColorStop(0, "#3ec6ff"); g.addColorStop(.6, "#bdeeff"); g.addColorStop(1, "#ffd6a5");
+      ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+      // sol
+      ctx.fillStyle = "#ffd23f"; ctx.beginPath(); ctx.arc(W - 60, 80, 34, 0, Math.PI * 2); ctx.fill();
+      // mar
+      const t = performance.now() / 1000;
+      ctx.fillStyle = "#00b4d8"; ctx.beginPath(); ctx.moveTo(0, H);
+      for (let x = 0; x <= W; x += 10) ctx.lineTo(x, H - 110 + Math.sin(x / 40 + t * 2) * 6);
+      ctx.lineTo(W, H); ctx.fill();
+      // areia
+      ctx.fillStyle = "#f6d89b"; ctx.fillRect(0, H - 40, W, 40);
+
+      ctx.textAlign = "center"; ctx.textBaseline = "middle";
+      if (itens) for (const it of itens) {
+        ctx.save(); ctx.translate(it.x, it.y); ctx.rotate(it.ang);
+        ctx.font = "36px serif"; ctx.fillText(it.e, 0, 0); ctx.restore();
+      }
+      if (mala) { ctx.font = mala.tam + "px serif"; ctx.fillText("🧳", mala.x, mala.y); }
+      if (efeitos) for (const ef of efeitos) {
+        ctx.globalAlpha = Math.max(ef.vida, 0); ctx.fillStyle = ef.cor;
+        ctx.font = "bold 24px Poppins, sans-serif"; ctx.fillText(ef.t, ef.x, ef.y);
+        ctx.globalAlpha = 1;
+      }
+    }
+
+    function fim() {
+      rodando = false;
+      const rec = lerRecorde(), novo = pontos > rec;
+      if (novo) salvarRecorde(pontos);
+      $("fimPontos").textContent = pontos;
+      $("fimTitulo").textContent = novo ? "Novo recorde! 🏆" : "O chefe ligou! 📞";
+      $("fimRecorde").textContent = "Recorde: " + Math.max(pontos, rec);
+      $("fimFrase").textContent =
+        pontos >= 50 ? "Mala de profissional! Já pode embarcar ✈️" :
+        pontos >= 25 ? "Mala quase pronta, falta só o protetor 🧴" :
+        pontos >= 10 ? "Tá esquecendo o chinelo, hein? 🩴" :
+                       "Assim vai pra praia de terno 😅";
+      mostrar("painelFim");
+    }
+
+    function moverPara(e) {
+      if (!mala) return;
+      const r = tela.getBoundingClientRect();
+      mala.x = Math.max(30, Math.min(W - 30, e.clientX - r.left));
+    }
+    tela.addEventListener("pointermove", moverPara);
+    tela.addEventListener("pointerdown", moverPara);
+    addEventListener("keydown", e => {
+      teclas[e.key] = true;
+      if (e.key === "Escape") fechar();
+      if (["ArrowLeft","ArrowRight"].includes(e.key) && rodando) e.preventDefault();
+    });
+    addEventListener("keyup", e => { teclas[e.key] = false; });
+    addEventListener("resize", () => { if (overlay.classList.contains("aberto")) { medir(); if (mala) mala.y = H - 70; desenhar(); } });
+
+    $("btnJogar").onclick = abrir;
+    $("btnFechar").onclick = fechar;
+    $("btnComecar").onclick = comecar;
+    $("btnDeNovo").onclick = comecar;
+    overlay.addEventListener("click", e => { if (e.target === overlay) fechar(); });
+  })();
 </script>
 </body>
 </html>
