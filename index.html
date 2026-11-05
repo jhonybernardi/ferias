@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rumo às Férias 🌴</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏖️</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  /* ============ CONFIGURE AQUI (também no script lá embaixo) ============ */
+  :root {
+    --ceu-topo: #3ec6ff;
+    --ceu-base: #ffd6a5;
+    --mar1: #00b4d8;
+    --mar2: #0096c7;
+    --mar3: #0077b6;
+    --areia: #f6d89b;
+    --coral: #ff6b6b;
+    --branco: #ffffff;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(180deg, var(--ceu-topo) 0%, #8fe3ff 45%, var(--ceu-base) 70%);
+    min-height: 100vh;
+    overflow-x: hidden;
+    color: var(--branco);
+    position: relative;
+  }
+
+  /* Sol */
+  .sol {
+    position: fixed; top: 6vh; right: 8vw;
+    width: 110px; height: 110px; border-radius: 50%;
+    background: radial-gradient(circle, #fff7ae 0%, #ffd23f 60%, #ffb703 100%);
+    box-shadow: 0 0 60px 20px rgba(255, 210, 63, .6);
+    animation: pulsar 4s ease-in-out infinite;
+    z-index: 0;
+  }
+  @keyframes pulsar { 50% { transform: scale(1.08); box-shadow: 0 0 90px 35px rgba(255,210,63,.7); } }
+
+  /* Nuvens */
+  .nuvem {
+    position: fixed; background: #fff; border-radius: 100px; opacity: .85; z-index: 0;
+    animation: flutuar linear infinite;
+  }
+  .nuvem::before, .nuvem::after { content: ''; position: absolute; background: #fff; border-radius: 50%; }
+  .nuvem::before { width: 50%; height: 160%; top: -70%; left: 15%; }
+  .nuvem::after  { width: 35%; height: 120%; top: -50%; right: 15%; }
+  .n1 { width: 140px; height: 40px; top: 12vh; animation-duration: 45s; }
+  .n2 { width: 100px; height: 30px; top: 25vh; animation-duration: 60s; animation-delay: -20s; }
+  .n3 { width: 170px; height: 45px; top: 5vh;  animation-duration: 75s; animation-delay: -40s; }
+  @keyframes flutuar { from { left: -200px; } to { left: 110vw; } }
+
+  /* Mar + areia */
+  .praia { position: fixed; bottom: 0; left: 0; width: 100%; height: 32vh; z-index: 1; pointer-events: none; }
+  .onda {
+    position: absolute; left: 0; width: 200%; height: 100%;
+    background-repeat: repeat-x; background-size: 50% 100%;
+    animation: ondular linear infinite;
+  }
+  .o1 { bottom: 9vh;  animation-duration: 14s; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M0 40 Q150 0 300 40 T600 40 T900 40 T1200 40 V120 H0Z' fill='%2300b4d8'/%3E%3C/svg%3E"); opacity: .8; }
+  .o2 { bottom: 6vh;  animation-duration: 10s; animation-direction: reverse; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M0 50 Q150 15 300 50 T600 50 T900 50 T1200 50 V120 H0Z' fill='%230096c7'/%3E%3C/svg%3E"); opacity: .9; }
+  .o3 { bottom: 3vh;  animation-duration: 7s;  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M0 60 Q150 30 300 60 T600 60 T900 60 T1200 60 V120 H0Z' fill='%230077b6'/%3E%3C/svg%3E"); }
+  @keyframes ondular { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  .areia {
+    position: absolute; bottom: 0; left: 0; width: 100%; height: 7vh;
+    background: var(--areia);
+    background-image: radial-gradient(#e4be72 1.2px, transparent 1.2px);
+    background-size: 14px 14px;
+    border-radius: 50% 50% 0 0 / 30% 30% 0 0;
+  }
+  .palmeira { position: fixed; bottom: 3vh; font-size: clamp(70px, 14vw, 150px); z-index: 2; transform-origin: bottom center; animation: balancar 5s ease-in-out infinite; pointer-events: none; }
+  .p-esq { left: -10px; }
+  .p-dir { right: -10px; transform: scaleX(-1); animation-name: balancar-inv; }
+  @keyframes balancar { 50% { transform: rotate(-4deg); } }
+  @keyframes balancar-inv { 0%,100% { transform: scaleX(-1) rotate(0); } 50% { transform: scaleX(-1) rotate(-4deg); } }
+
+  /* Emojis flutuando */
+  .flutuante { position: fixed; bottom: -60px; font-size: 28px; z-index: 1; animation: subir linear forwards; pointer-events: none; }
+  @keyframes subir { to { transform: translateY(-115vh) rotate(360deg); opacity: 0; } }
+
+  /* Conteúdo */
+  main {
+    position: relative; z-index: 3;
+    min-height: 100vh;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 40px 16px 30vh; text-align: center;
+  }
+  h1 {
+    font-family: 'Pacifico', cursive;
+    font-size: clamp(2.4rem, 8vw, 5rem);
+    text-shadow: 3px 3px 0 var(--coral), 6px 6px 0 rgba(0,0,0,.12);
+    line-height: 1.2;
+  }
+  .nomes {
+    margin-top: 8px;
+    font-size: clamp(1.1rem, 3.5vw, 1.6rem); font-weight: 600;
+    background: rgba(255,255,255,.25); backdrop-filter: blur(6px);
+    padding: 6px 22px; border-radius: 999px;
+    text-shadow: 1px 1px 2px rgba(0,0,0,.2);
+  }
+  .contador { display: flex; gap: clamp(8px, 2.5vw, 22px); margin-top: 36px; flex-wrap: wrap; justify-content: center; }
+  .caixa {
+    background: rgba(255,255,255,.92);
+    color: var(--mar3);
+    width: clamp(72px, 19vw, 140px);
+    padding: clamp(12px, 2.5vw, 22px) 6px;
+    border-radius: 22px;
+    box-shadow: 0 10px 0 rgba(0,119,182,.25), 0 15px 30px rgba(0,0,0,.15);
+    animation: boiar 3s ease-in-out infinite;
+  }
+  .caixa:nth-child(2) { animation-delay: .4s; }
+  .caixa:nth-child(3) { animation-delay: .8s; }
+  .caixa:nth-child(4) { animation-delay: 1.2s; }
+  @keyframes boiar { 50% { transform: translateY(-10px); } }
+  .num { font-size: clamp(2rem, 7vw, 4rem); font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
+  .rot { font-size: clamp(.7rem, 2vw, 1rem); text-transform: uppercase; letter-spacing: 2px; color: var(--coral); font-weight: 600; margin-top: 6px; }
+  .data {
+    margin-top: 30px; font-size: clamp(.95rem, 2.6vw, 1.2rem); font-weight: 600;
+    text-shadow: 1px 1px 3px rgba(0,0,0,.25);
+  }
+  .frase { margin-top: 10px; font-size: clamp(.9rem, 2.4vw, 1.1rem); min-height: 1.5em; text-shadow: 1px 1px 3px rgba(0,0,0,.25); transition: opacity .5s; }
+
+  .chegou h1 { animation: pular .6s ease-in-out infinite alternate; }
+  @keyframes pular { to { transform: scale(1.08) rotate(-2deg); } }
+
+  /* Confete */
+  .confete { position: fixed; top: -20px; width: 10px; height: 16px; z-index: 5; animation: cair linear forwards; pointer-events: none; }
+  @keyframes cair { to { transform: translateY(110vh) rotate(720deg); } }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; }
+  }
+</style>
+</head>
+<body>
+  <div class="sol"></div>
+  <div class="nuvem n1"></div>
+  <div class="nuvem n2"></div>
+  <div class="nuvem n3"></div>
+
+  <main id="app">
+    <h1 id="titulo">Rumo às Férias!</h1>
+    <div class="nomes" id="nomes"></div>
+
+    <div class="contador" id="contador">
+      <div class="caixa"><div class="num" id="dias">0</div><div class="rot">dias</div></div>
+      <div class="caixa"><div class="num" id="horas">00</div><div class="rot">horas</div></div>
+      <div class="caixa"><div class="num" id="minutos">00</div><div class="rot">min</div></div>
+      <div class="caixa"><div class="num" id="segundos">00</div><div class="rot">seg</div></div>
+    </div>
+
+    <p class="data" id="data"></p>
+    <p class="frase" id="frase"></p>
+  </main>
+
+  <div class="praia">
+    <div class="onda o1"></div>
+    <div class="onda o2"></div>
+    <div class="onda o3"></div>
+    <div class="areia"></div>
+  </div>
+  <div class="palmeira p-esq">🌴</div>
+  <div class="palmeira p-dir">🌴</div>
+
+<script>
+  // ==================== CONFIGURE AQUI ====================
+  const DATA_FERIAS = "2027-01-27T08:00:00";   // ano-mês-diaThora:min:seg
+  const NOMES       = "Jhony & Vitória 💛";
+  // ========================================================
+
+  const FRASES = [
+    "☀️ Protetor solar já tá na lista?",
+    "🍹 Água de coco gelada nos espera...",
+    "🐚 Pé na areia, cabeça nas nuvens",
+    "🌊 Cada segundo é uma onda a menos!",
+    "🩴 Chinelo no pé e zero preocupação",
+    "🏖️ Falta pouco pro paraíso!",
+    "🍉 Sol, mar e muita risada",
+    "📸 Já pensou nas fotos?"
+  ];
+  const EMOJIS = ["🌴","🍹","🏖️","🐚","☀️","🌺","🦀","🍍","🩴","🕶️","🐠","🍉","⛱️","🥥"];
+
+  const alvo = new Date(DATA_FERIAS).getTime();
+  document.getElementById("nomes").textContent = NOMES;
+  document.getElementById("data").textContent = "📅 " + new Date(alvo).toLocaleDateString("pt-BR", {
+    weekday: "long", day: "numeric", month: "long", year: "numeric"
+  });
+
+  const $ = id => document.getElementById(id);
+  const dois = n => String(n).padStart(2, "0");
+  let comemorou = false;
+
+  function atualizar() {
+    const diff = alvo - Date.now();
+    if (diff <= 0) {
+      $("dias").textContent = "0";
+      $("horas").textContent = $("minutos").textContent = $("segundos").textContent = "00";
+      if (!comemorou) {
+        comemorou = true;
+        $("titulo").textContent = "Chegaram as Férias! 🎉";
+        $("app").classList.add("chegou");
+        $("frase").textContent = "🥳 Bora pra praia, aproveitem cada segundo!";
+        setInterval(confete, 250);
+      }
+      return;
+    }
+    const s = Math.floor(diff / 1000);
+    $("dias").textContent = Math.floor(s / 86400);
+    $("horas").textContent = dois(Math.floor(s % 86400 / 3600));
+    $("minutos").textContent = dois(Math.floor(s % 3600 / 60));
+    $("segundos").textContent = dois(s % 60);
+  }
+
+  let iFrase = 0;
+  function trocarFrase() {
+    if (comemorou) return;
+    const el = $("frase");
+    el.style.opacity = 0;
+    setTimeout(() => { el.textContent = FRASES[iFrase++ % FRASES.length]; el.style.opacity = 1; }, 500);
+  }
+
+  function soltarEmoji() {
+    const e = document.createElement("div");
+    e.className = "flutuante";
+    e.textContent = EMOJIS[Math.floor(Math.random() * EMOJIS.length)];
+    e.style.left = Math.random() * 100 + "vw";
+    e.style.fontSize = 20 + Math.random() * 24 + "px";
+    e.style.animationDuration = 8 + Math.random() * 8 + "s";
+    document.body.appendChild(e);
+    setTimeout(() => e.remove(), 17000);
+  }
+
+  function confete() {
+    const cores = ["#ff6b6b","#ffd23f","#06d6a0","#118ab2","#ff9f1c","#ef476f"];
+    for (let i = 0; i < 6; i++) {
+      const c = document.createElement("div");
+      c.className = "confete";
+      c.style.left = Math.random() * 100 + "vw";
+      c.style.background = cores[Math.floor(Math.random() * cores.length)];
+      c.style.animationDuration = 2.5 + Math.random() * 2.5 + "s";
+      document.body.appendChild(c);
+      setTimeout(() => c.remove(), 5500);
+    }
+  }
+
+  atualizar();
+  trocarFrase();
+  setInterval(atualizar, 1000);
+  setInterval(trocarFrase, 4000);
+  setInterval(soltarEmoji, 1200);
+</script>
+</body>
+</html>
